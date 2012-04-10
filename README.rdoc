@@ -1,0 +1,12 @@
+= dtime
+This Plugin provides the capability to submit dayly timesheets within redmine. The user must be a 
+member of a project with permission to log time.
+
+This plugin uses the Time Entry model and presents them in a dayly view.
+New Timesheets can be entered using the link ‘Edit TS’, new issues can be added to the 
+timesheet using the ‘Add Row’ link.
+
+If duplicate entries are made on a new timesheet, it will sum up the hours for those duplicate entries.
+
+This plugin uses js and css assets and it will be copied to public/plugin_asset/redmine_dtime
+folder upon server startup, so please make sure public/plugin_asset/redmine_dtime has proper access.

@@ -1,0 +1,49 @@
+<tr class="time-entry <%= cycle("odd", "even") %>">
+<% @trOpen = true %>
+<% @row += 1 unless isTemplate %>
+<td class="project" align="left"><%=h select_tag(isTemplate ? '__template__time_entry[][project_id]' : 'time_entry[][project_id]', 
+	options_for_select(@projects.collect{|p| [ p.name, p.id ] }, :selected =>  entry.nil? ? 0 : entry.project_id),
+	:onchange => "projectChanged(this,#{@row.to_s()});", :style=> 'width:150px' ) %></td>
+	
+<% 
+curr_issue_found = false
+issues = Array.new
+# add an empty issue to the array
+issues << [ "", ""]
+
+if needClosedIssues
+allIssues = Issue.find_all_by_project_id(entry.nil? ? (@projects.empty? ? 0 : @projects[0].id) : entry.project_id)
+else
+allIssues = Issue.find_all_by_project_id(entry.nil? ? (@projects.empty? ? 0 : @projects[0].id) : entry.project_id,
+			:conditions => ["#{IssueStatus.table_name}.is_closed = ? OR #{Issue.table_name}.updated_on >= ?", false, @date],
+			:include => :status)
+end
+
+# find the issues which are visible to the user
+allIssues.each do |i|
+	if i.visible?(@user)
+		issues << [ i.id.to_s + ' - ' + i.subject, i.id ] 
+		curr_issue_found = true if !entry.nil? && i.id == entry.issue_id
+	end
+end
+#check if the issue, which was previously reported time, is still visible
+#if it is not visible, just show the id alone
+issues << [ entry.issue_id, entry.issue_id ] if !entry.nil? && !entry.issue_id.nil? &&!curr_issue_found
+
+project = entry.nil? ? (@projects.empty? ? nil : @projects[0]) : entry.project
+activities = project.activities.collect {|a| [ a.name, a.id ] } unless project.nil?
+activities = activities.sort_by{|name, id| name} unless activities.blank?
+
+activity = activities.detect {|a| a[1].to_i == entry.activity_id.to_i} unless entry.nil?
+#check if the activity, which was previously reported time, is still visible
+#if it is not visible, just show the id alone
+activities << [ entry.activity_id, entry.activity_id ] if !entry.nil? && activity.blank?		
+		
+%>
+
+<td class="issue" align="left"><%=h select_tag(isTemplate ? '__template__time_entry[][issue_id]' : 'time_entry[][issue_id]', 
+	options_for_select(issues, :selected =>  entry.nil? ? 0 : entry.issue_id, :required => true),
+	:style=> 'width:250px' ) %></td>
+<td class="activity" align="left"><%=h select_tag(isTemplate ? '__template__time_entry[][activity_id]' : 'time_entry[][activity_id]', 
+	activities.blank? ? nil : options_for_select(activities, :selected => entry.nil? ? 0 : entry.activity_id)) %></td>
+<% @wday_index = 1 %>

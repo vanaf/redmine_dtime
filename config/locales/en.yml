@@ -1,0 +1,16 @@
+# English strings go here for Rails i18n
+en:
+  my_label: "My label"
+  label_dtime: "Dayly Time"
+  dtime_edit_ts_menu_label: "Edit TS"
+  
+  button_new_dtime: "New D-time"
+  button_continue: "Continue"
+  button_add_row: "Add Row"
+  chkbox_prev_tmpl: "Previous Week's Template"
+  chkbox_closed_issues: "Include Old Closed Issues"
+  
+  error_dtime_save_failed: "Could not save D-Time: %{value}"
+  error_dtime_save_nothing: "Nothing to Save"
+  
+

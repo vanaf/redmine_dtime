@@ -1,0 +1,41 @@
+<% labelled_tabular_form_for('dtime_new', @time_entry, :url => {
+                               :action => 'edit',
+                               :id => @time_entry
+                             },
+                             :html => {:method => :post, 
+								:name => 'dtime_new'}) do |f| %>
+
+<% # = render_timelog_breadcrumb %>
+
+<h2><%= l(:label_dtime) %></h2>
+	 
+<%= error_messages_for 'time_entry' %>
+<%= back_url_hidden_field_tag %>
+
+<table>
+<tr>
+<th width="100px" ><%=l(:field_user)%></th>
+<% if @sorted_user_ids.count > 1 %>
+<td><%=h select_tag('user_id', 
+	options_for_select(@sorted_user_ids, :selected =>  @user.nil? ? User.current.id : @user.id)) %>
+</td>
+<% else %>
+<td>
+<%=h @sorted_user_ids[0][0] %>
+<%=h hidden_field_tag('user_id', @sorted_user_ids[0][1]) %>
+</td>
+<% end %>
+</tr>
+<tr>
+<th width="100px"><%=l(:field_start_date)%></th>
+<td><%=h text_field_tag('mon',@mon,:size => 10, :required => true) %><%= calendar_for('mon') %> 
+</td>
+</tr>
+<tr>
+<th width="100px"><%= l(:chkbox_prev_tmpl) %></th>
+<td><%= check_box_tag('prev_template', 1, true) %></td>
+</tr>
+</table>
+<%= submit_tag l(:button_continue), :id => 'dtime_add'%>
+
+<% end %>

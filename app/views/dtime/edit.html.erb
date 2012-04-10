@@ -1,0 +1,102 @@
+ <%= javascript_include_tag 'jquery-1.7.1.min.js', :plugin => "redmine_dtime" %>
+ <%= javascript_include_tag 'jquery-ui-1.8.18.custom.min.js', :plugin => "redmine_dtime" %>
+ <%= stylesheet_link_tag 'jquery-ui-1.8.18.custom.css', :plugin => "redmine_dtime" %>
+ <%= stylesheet_link_tag 'd-time', :plugin => "redmine_dtime" %>
+
+
+  <%= javascript_include_tag 'edit', :plugin => "redmine_dtime" %>
+	
+	<div id="comment-dlg" title="Comments">
+	<!-- modified class .ui-widget-header to change the header color -->
+		<textarea name="_edit_comments_" id="_edit_comments_" value="" cols="25" rows="2"> </textarea>
+		<span id="_edit_comm_proj_">project</span><br />
+		<span id="_edit_comm_iss_">issue</span><br />
+		<span id="_edit_comm_act_">issue</span>
+
+	</div>
+
+ 
+<div style="display:none">
+<%# template row used by the 'add row' button %>
+<table id="issueTemplate">
+<tbody>
+	<% @row = 0 %>
+	<%= render :partial => 'edit_issues2', :locals => {:entry => nil , :isTemplate => true, :needClosedIssues => false}%>
+	<%= render :partial => 'edit_hours', :locals => {:entry => nil, :isTemplate => true, :padAt => 'end', :padTill => 2}%>
+</tbody>
+</table>
+</div>
+
+<div style="display:none">
+<%# template row used by the 'add row' button %>
+<table id="closedIssueTemplate">
+<tbody>
+	<% @row = 0 %>
+	<%= render :partial => 'edit_issues2', :locals => {:entry => nil, :isTemplate => true, :needClosedIssues => true}%>
+	<%= render :partial => 'edit_hours', :locals => {:entry => nil, :isTemplate => true, :padAt => 'end', :padTill => 2}%>
+</tbody>
+</table>
+</div>
+
+
+<h2><%= l(:label_dtime) %></h2>
+<% labelled_tabular_form_for('dtime_edit', @time_entry, :url => {
+                               :action => 'update',
+                               :id => @time_entry
+                             },
+                             :html => {:method => :post, 
+								:name => 'dtime_edit'}) do |f| %>
+
+<% # = render_timelog_breadcrumb %>
+
+
+
+							 
+<%= error_messages_for 'time_entry' %>
+<%= back_url_hidden_field_tag %>
+
+<%=h hidden_field_tag('getissues_url', "#{url_for(:controller => 'dtime', :action => 'getissues')}") %>
+<%=h hidden_field_tag('getactivities_url', "#{url_for(:controller => 'dtime', :action => 'getactivities')}") %>
+<%=h hidden_field_tag('deleterow_url', "#{url_for(:controller => 'dtime', :action => 'deleterow')}") %>
+<%=h hidden_field_tag('edit_url', "#{url_for(:controller => 'dtime', :action => 'edit')}") %>
+<%=h hidden_field_tag('orig_date', @date) %>
+
+
+
+<center>
+<table class='dtime_head'>
+<tr>
+<th><%=l(:label_user)%></th>
+<td><%=h @user.name %>
+<%=h hidden_field_tag('user_id', @user.id) %>
+</td>
+</tr>
+<tr>
+</tr>
+<tr>
+<th><%=l(:label_date)%></th>
+<td>
+<%= text_field_tag 'date', @date, :size => 10, :onchange => "dateChanged(this);" %>
+<%= calendar_for('date') %>
+</td>
+</tr>
+<tr>
+<th><%=l(:label_overall_spent_time)%></th>
+<td><span id="total_hours"><%= @total_hours %></span></td>
+</tr>
+<tr><td colspan="2" style="text-align:left;">
+<%= check_box_tag('closed_issue_ind', 1, false, :onclick => "reloadIssues(this.checked);") %>
+<%= l(:chkbox_closed_issues) %>
+</td></tr>
+
+</table>
+</center>
+<%= render :partial => 'edit_issues', :locals => { :entries => @prev_template ? @prev_entries : @entries, :f => f }%>
+
+<% html_title l(:label_spent_time), l(:label_details) %>
+
+<% content_for :header_tags do %>
+    <%= auto_discovery_link_tag(:atom, {:issue_id => @issue, :format => 'atom', :key => User.current.rss_key}, :title => l(:label_spent_time)) %>
+<% end %>
+
+<% end %>
