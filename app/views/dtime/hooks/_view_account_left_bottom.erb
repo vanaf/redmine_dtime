@@ -1,0 +1,20 @@
+<h3><%=l(:label_week_report_plural)%></h3>
+<% labelled_tabular_form_for('dtime_weekly_report', :url => {
+				:controller => 'dtime',
+                                :action => 'show_week'
+                             },
+                             :html => {:method => :post,
+                                                                :name => 'dtime_edit'}) do |f| %>
+<%=h hidden_field_tag('user_id', @user.id) %>
+<table>
+<tr>
+<th><%=l(:label_date_for_week)%></th>
+<td>
+<%= text_field_tag 'date', Date.today, :size => 10 %>
+<%= calendar_for('date') %>
+<%= submit_tag l(:button_view), :id => 'dtime_select_week'%>
+</td>
+</tr>
+</table>
+
+<% end %>

@@ -1,0 +1,12 @@
+	<% if @trOpen %>
+		<% # close the previously opened tr %>
+		<% while @wday_index < padTill %>
+			<td class="hours">
+			</td>
+			<% @wday_index += 1 %>
+		<% end %>
+		<% if padAt == 'end' %>
+			</tr>
+			<% @trOpen = false %>
+		<% end %>
+	<% end %>

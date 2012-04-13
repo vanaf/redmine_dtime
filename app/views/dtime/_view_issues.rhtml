@@ -1,0 +1,69 @@
+<% 
+@wday_index = 1 
+@trOpen = false
+@row = 0
+@total_hours = 0
+thours = nums = Array[0.0, 0.0, 0.0, 0.0,0.0, 0.0, 0.0]
+prev_entry = nil
+entry = nil 
+%>
+
+<table id="issueTable" class="list time-entries">
+<thead>
+<tr>
+	<%= render :partial => 'week_issue_header'%>
+</tr>
+</thead>
+<tbody>
+<% unless entries.blank? %>
+	<% entries.each do |entry| -%>
+		<% if prev_entry.nil? || 
+			(entry.project.id != prev_entry.project.id || entry.issue_id != prev_entry.issue_id || 
+			entry.activity_id  != prev_entry.activity_id || entry.spent_on == prev_entry.spent_on)  %>
+			<% # this is a new Row %>
+			<% # close the previously opened row first %>
+			<%= render :partial => 'view_hours', :locals => {:entry => prev_entry, :isTemplate => false,
+				:padAt => 'end', :padTill => 8}%>
+
+			<%= render :partial => 'view_issues2', :locals => {:entry => entry, :isTemplate => false,
+			:needClosedIssues => !params['closed_issue_ind'].blank?}%>			
+		<% end %>
+		<% # if it is a different row%>
+
+		<%# @wday_index += 1 %>
+		<% wday = entry.spent_on.cwday %>
+		<% if @wday_index != wday %>
+			<% # fill the days till the current day %>
+			<%= render :partial => 'view_hours', :locals => {:entry => entry, :isTemplate => false, 
+				:padAt => 'begin', :padTill => wday}%>
+		<% end %>
+
+		<%#if this is from a previous template, don't print the hours%>
+		<td class="hours" style="text-align:center;"><%= entry.hours %>
+		<% thours[@wday_index-1] += entry.hours unless @prev_template%>
+		<% @wday_index += 1 %>
+		<% @total_hours += entry.hours unless @prev_template%>
+			
+		<% prev_entry = entry %>
+
+	<% end -%>
+<% end %>
+	
+	<% # pad any incomplete days %>
+	<%= render :partial => 'view_hours', :locals => {:entry => entry, :isTemplate => false,
+		:padAt => 'end', :padTill => 8}%>
+
+	<!-- row for putting the total -->
+	<tr>
+        <th colspan="4" style="text-align:right;"><%= l(:label_total)%></td>
+	<% thours.each do |th| %>
+		<th class="hours"><%= th %></th>
+	<% end %>
+	</tr>
+	
+</tbody>
+</table>
+
+<div class="splitcontentright">
+</div>
+<%= context_menu time_entries_context_menu_path %>

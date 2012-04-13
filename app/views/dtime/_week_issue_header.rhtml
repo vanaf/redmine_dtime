@@ -1,0 +1,7 @@
+<th align="left">№</th>
+<th align="left"><%= l(:field_project) %></th>
+<th align="left"><%= l(:field_issue) %></th>
+<th align="left"><%= l(:field_activity) %></th>
+<% for i in 0..6%>
+<th><%= l('date.abbr_day_names')[(i+1)%7] %><br /><%= (@mon+i).mon().to_s() + '/' + (@mon+i).day().to_s() unless @mon.nil? %></th>
+<% end %>

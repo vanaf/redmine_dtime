@@ -1,0 +1,10 @@
+<tr class="time-entry <%= cycle("odd", "even") %>">
+<% @trOpen = true %>
+<% @row += 1 unless isTemplate %>
+<td><%=@row%></td>
+<td class="project" align="left"><%= entry.project.name %></td>
+	
+
+<td class="issue" align="left"><%= entry.issue.id.to_s + " - " + entry.issue.subject if !entry.issue.blank? %></td>
+<td class="activity" align="left"><%= entry.activity.name %></td>
+<% @wday_index = 1 %>

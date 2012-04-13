@@ -2,6 +2,10 @@
 en:
   my_label: "My label"
   label_dtime: "Dayly Time"
+  label_week_report: "Weekly report"
+  label_week_report_plural: "Weekly reports"
+  label_date_for_week: "Select week by picking date"
+
   dtime_edit_ts_menu_label: "Edit TS"
   
   button_new_dtime: "New D-time"

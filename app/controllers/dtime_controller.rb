@@ -69,6 +69,37 @@ before_filter :check_rw_perm_and_redirect, :only => [:edit, :update, :destroy]
 
   end
 
+  def show_week
+        respond_to do |format|
+                format.html {
+                        @date = Date.today
+                        if !params[:date].blank?
+                                @date = params[:date].to_s.to_date
+                        end
+                        @mon = getMonday(@date)
+			@all_users = User.find(:all,:order => 'lastname, firstname')
+			@user_id = User.current.id
+			if !params[:user_id].blank?
+                        	@user_id = params[:user_id]
+			end
+                        cond = getCondition(@mon, @user_id)
+                        @entries = TimeEntry.find(:all, :include => [:project, :issue, :activity] , :conditions => cond.conditions,
+                                :order => 'project_id, issue_id, activity_id, spent_on')
+                        @total_hours = 0
+                        @total_hours =  @entries.sum(&:hours) if !@entries.blank?
+                        if @entries.blank? && !params[:prev_template].blank?
+                                @prev_entries = prevTemplate(user_id)
+                                @prev_template = true
+                        end
+			@user = User.find(@user_id)
+                        render :layout => !request.xhr?
+                }
+                format.api  {
+                }
+        end
+  end
+
+
   def edit
 	respond_to do |format|
 		format.html {

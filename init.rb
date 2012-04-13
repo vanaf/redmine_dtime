@@ -1,5 +1,5 @@
 require 'redmine'
-
+require_dependency 'dtime_hooks'
 Redmine::Plugin.register :redmine_dtime do
   name 'Dayly Timesheet'
   author 'Ivan Afonichev'

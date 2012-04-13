@@ -1,0 +1,67 @@
+ <%= javascript_include_tag 'jquery-1.7.1.min.js', :plugin => "redmine_dtime" %>
+ <%= javascript_include_tag 'jquery-ui-1.8.18.custom.min.js', :plugin => "redmine_dtime" %>
+ <%= stylesheet_link_tag 'jquery-ui-1.8.18.custom.css', :plugin => "redmine_dtime" %>
+ <%= stylesheet_link_tag 'd-time', :plugin => "redmine_dtime" %>
+
+
+  <%= javascript_include_tag 'edit', :plugin => "redmine_dtime" %>
+	
+
+<h2><%= l(:label_wktime) %></h2>
+
+
+<% labelled_tabular_form_for('wktime_edit', @time_entry, :url => {
+                               :action => 'show_week',
+                               :id => @time_entry
+                             },
+                             :html => {:method => :post, 
+								:name => 'wktime_edit'}) do |f| %>
+
+<% # = render_timelog_breadcrumb %>
+
+
+
+							 
+<%= error_messages_for 'time_entry' %>
+<%= back_url_hidden_field_tag %>
+
+
+
+
+<center>
+<table class='dtime_head'>
+<tr>
+<th><%=l(:label_user)%></th>
+<td>
+<%= select_tag 'user_id', principals_options_for_select(@all_users,@user) %>
+</td>
+<td rowspan="2" valign="center">
+<%= submit_tag l(:button_view), :id => 'dtime_select_week'%>
+</td>
+</tr>
+<tr>
+<th><%=l(:label_date_range).mb_chars.capitalize.to_s%></th>
+<td>
+
+<%= l(:label_date_from_to, :start => text_field_tag('date', @mon, :size => 10)+calendar_for('date'), :end => @mon+6) %>
+</td>
+</tr>
+<tr>
+<th><%=l(:label_overall_spent_time)%></th>
+<td><span id="total_hours"><%= @total_hours %></span></td>
+</td></td>
+</tr>
+
+</table>
+</center>
+
+<%= render :partial => 'view_issues', :locals => { :entries => @entries, :f => f }%>
+
+
+<% html_title l(:label_spent_time), l(:label_details) %>
+
+<% content_for :header_tags do %>
+    <%= auto_discovery_link_tag(:atom, {:issue_id => @issue, :format => 'atom', :key => User.current.rss_key}, :title => l(:label_spent_time)) %>
+<% end %>
+
+<% end %>
