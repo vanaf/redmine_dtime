@@ -1,0 +1,18 @@
+<h3><%= l(:dtime_notify_managers_body) %></h3>
+
+<ul>
+<% @dateUsers.sort.each do |date,users| -%>
+  <li>
+	<h4><%=h date.to_s %></h4> 
+	<ul>
+	<%users.each do |user|%>
+		<li>
+		<a href="<%= url_for(:controller => 'dtime', :action => 'show_week',  :date => date, :user_id => user.id, :only_path => false) %>"><%=user%></a>
+		</li>
+	<%end%>
+	</ul>
+  </li>
+<% end -%>
+</ul>
+
+<p><%= l(:dtime_notify_managers_bottom) %></p>

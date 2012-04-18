@@ -1,0 +1,7 @@
+<%= l(:dtime_notify_user_body) %>
+
+<% @dates.sort.each do |date| -%>
+* <%=h date.to_s %>
+<% end -%>
+
+<%= l(:dtime_notify_user_bottom) %>

@@ -17,4 +17,12 @@ en:
   error_dtime_save_failed: "Could not save D-Time: %{value}"
   error_dtime_save_nothing: "Nothing to Save"
   
+  dtime_notify_managers_subject: "Some employees' timesheets are not filled fully"
+  dtime_notify_managers_body: "Employees for this dates doesn't fill their timesheet fully"
+  dtime_notify_managers_bottom: "Please let this people know about TS filling requirements"
+
+  dtime_notify_user_subject: "Your timesheet(s) are not filled fully"
+  dtime_notify_user_body: "Your timesheet(s) are not filled fully for this dates:"
+  dtime_notify_user_bottom: "Please follow TS filling requirements"
+
 

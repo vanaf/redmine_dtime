@@ -1,0 +1,11 @@
+<%= l(:dtime_notify_managers_body) %>
+
+<% @dateUsers.sort.each do |date,users| -%>
+*<%= date.to_s %>
+ <%users.each do |user|%>
+  -  <%=user%>
+ <%end%>
+<% end -%>
+
+<%= l(:dtime_notify_managers_bottom) %>
+

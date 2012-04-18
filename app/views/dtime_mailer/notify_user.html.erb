@@ -1,0 +1,11 @@
+<h3><%= l(:dtime_notify_user_body) %></h3>
+
+<ul>
+<% @dates.sort.each do |date| -%>
+  <li>
+	<a href="<%= url_for(:controller => 'dtime', :action => 'edit',  :date => date, :only_path => false) %>"><%=h date.to_s %></a>
+  </li>
+<% end -%>
+</ul>
+
+<p><%= l(:dtime_notify_user_bottom) %></p>
