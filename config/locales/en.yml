@@ -5,9 +5,15 @@ en:
   label_week_report: "Weekly report"
   label_week_report_plural: "Weekly reports"
   label_date_for_week: "Select week by picking date"
+  dtime_label_main_page: "Main Page"
 
   dtime_edit_ts_menu_label: "Edit TS"
   
+  dtime_label_caldays: "Calendar days"
+  dtime_label_menhour_plural: "Menhours"
+  dtime_label_main_issue_plural: "Main issues"
+
+
   button_new_dtime: "New D-time"
   button_continue: "Continue"
   button_add_row: "Add Row"

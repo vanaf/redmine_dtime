@@ -7,62 +7,37 @@ before_filter :check_rw_perm_and_redirect, :only => [:edit, :update, :destroy]
 
 
   def index
-    retrieve_date_range
-	@from = getMonday(@from)
-	@to = getSunday(@to)
 	
     respond_to do |format|
       format.html {
         # Paginate results
-		user_id = params[:user_id]
-		set_user_projects(User.current)
-		ids = nil		
-		if user_id.blank?
-			ids = User.current.id.to_s
-		elsif user_id.to_i == 0
-			#all users
-			@user_ids.values.each_with_index do|id, i|
-				if i == 0
-					ids =  id.to_s
-				else
-					ids +=  ',' + id.to_s
-				end
-			end		
-			ids = User.current.id.to_s if ids.nil?
-		else
-			ids = user_id
-		end
-		# mysql - the weekday index for date (0 = Monday, 1 = Tuesday, … 6 = Sunday)
-		sqlStr = "select user_id, monday as spent_on, hours from " +
-			" (select adddate(t.spent_on,weekday(t.spent_on)*-1) as monday, "
+		set_user_projects(User.current,:view_time_entries)
+
+		cond = ARCondition.new
+    		cond << ['project_id IN ('+@projects.collect{|p| p.id}.join(', ')+')']
 		
-		# postgre doesn't have the weekday function
-		# The day of the week (0 - 6; Sunday is 0)
-		if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
-			sqlStr = "select user_id, monday as spent_on, hours from " +
-				" (select case when cast(extract(dow from t.spent_on) as integer) = 0 then t.spent_on - 6" +
-				" else t.spent_on - (cast(extract(dow from t.spent_on) as integer) - 1) end as monday, "
-		elsif ActiveRecord::Base.connection.adapter_name == 'SQLite'
-			sqlStr = "select user_id, monday as spent_on, hours from " +
-				" (select date(spent_on, '-' || strftime('%w', spent_on, '-1 days') || ' days') as monday, "
-		end
-		sqlStr += " t.user_id, sum(t.hours) as hours from time_entries t, users u" +
-			" where u.id = t.user_id and u.id in (" + 
-			ids +") and t.spent_on between '" + 
-			@from.to_s() + "' and '" + @to.to_s() + "' group by monday, user_id order by monday desc, user_id) as v1"
+		
+    		@hoursPerProject = TimeEntry.find(:all,:select =>"project_id, sum(hours) as sum_hours" ,:conditions => cond.conditions,:group => "project_id")
 
-		 
-		result = TimeEntry.find_by_sql("select count(*) as id from (" + sqlStr + ") as v2")
-		@entry_count = result[0].id
-        @entry_pages = Paginator.new self, @entry_count, per_page_option, params['page']
-			
-		@entries = TimeEntry.find_by_sql(sqlStr + 
-			" LIMIT " + @entry_pages.items_per_page.to_s +
-			" OFFSET " + @entry_pages.current.offset.to_s)
 
-        #@total_hours = TimeEntry.visible.sum(:hours, :include => [:user], :conditions => cond.conditions).to_f
-		result = TimeEntry.find_by_sql("select sum(hours) as hours from (" + sqlStr + ") as v2")
-		@total_hours = result[0].hours
+                @hoursPerMembersPerProject = TimeEntry.find(:all,:select =>"project_id, user_id, sum(hours) as sum_hours" , :include => [:user] , :conditions => cond.conditions,:group => "project_id, user_id", :order => 'project_id, sum_hours DESC')
+
+		@neededActivities = TimeEntryActivity.shared.active.sort[0..1]
+		cond << ['activity_id IN ('+@neededActivities.collect{|a| a.id}.join(', ')+')']
+
+                @neededRoles = Role.find(:all, :order => 'builtin, position')[0..0]
+
+		@neededCF = ProjectCustomField.find(:all, :order => 'position')[0..0]
+
+                @hoursPerActivityPerProject = TimeEntry.find(:all,:select =>"project_id,activity_id, sum(hours) as sum_hours" ,:conditions => cond.conditions,:group => "project_id, activity_id")
+		
+#		@projects.each do |p|
+#			projectDurations[p] = Date.today - p.start_date
+#			projectHours[p] = hoursPerProject.select{|hpp| hpp.project_id == p.id}.first.sum_hours
+#			projectActivitiesHours[p] = hoursPerActivityPerProject.select{|hpapp| hpapp.project_id == p.id}
+#			projectHoursByActions = TimeEntry.find(:all,:select =>"actvity_id, sum(hours) as sum_hours",)
+#			logger.info projectHours
+#		end
         render :layout => !request.xhr?
       }
     end
@@ -108,7 +83,7 @@ before_filter :check_rw_perm_and_redirect, :only => [:edit, :update, :destroy]
 			if !params[:date].blank?
 				@date = params[:date].to_s.to_date
 			end
-			logger.info @date
+#			logger.info @date
 
 			@entries = TimeEntry.find_all_by_spent_on_and_user_id(@date,User.current.id,:order => 'project_id, issue_id, activity_id, spent_on')
 			@total_hours = 0
@@ -425,7 +400,7 @@ private
     @to   ||= (TimeEntry.latest_date_for_project(@project) || Date.today)
   end  
 
-	def set_user_projects(user)
+	def set_user_projects(user=User.current, action = :log_time)
 		@projects = Array.new
 		proj_members = Array.new
 		@user_ids = Hash.new
@@ -436,7 +411,7 @@ private
 		allProjects = Project.find(:all, :order => 'name')
 		allProjects.each do |p|
 			#get the list of allowable projects.
-			if !@user.nil? && @user.allowed_to?(:log_time, p)
+			if !@user.nil? && @user.allowed_to?(action, p)
 				@projects << p
 			end
 			# if the user can manage other isers then add them in

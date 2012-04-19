@@ -1,0 +1,29 @@
+# Russian strings go here for Rails i18n
+ru:
+  my_label: "My label"
+  label_dtime: "Ежедневный TS"
+  label_week_report: "Недельный отчет"
+  label_week_report_plural: "Недельные отчеты"
+  label_date_for_week: "Выберите неделю по дате"
+  dtime_label_main_page: "Общая страница"
+
+  dtime_edit_ts_menu_label: "Редактировать TS"
+  
+  dtime_label_caldays: "Календарных дней"
+  dtime_label_menhour_plural: "Человеко-часов"
+
+  button_continue: "Продолжить"
+  button_add_row: "Добавить строку"
+  chkbox_closed_issues: "Показать старые закрытые задачи"
+  
+  error_dtime_save_failed: "Ошибка сохранения D-Time: %{value}"
+  error_dtime_save_nothing: "Нечего сохранять"
+  
+  dtime_notify_managers_subject: "Некоторые сотрудники недозапонили TS"
+  dtime_notify_managers_body: "Данные сотрудники недозаполнили TS за эти даты"
+  dtime_notify_managers_bottom: "Пожалуйста объясните этим людям как надо заполнять TS"
+
+  dtime_notify_user_subject: "Ваш(ы) TS недозаполнен(ы)"
+  dtime_notify_user_body: "Ваш(ы) TS недозаполнен(ы) за эти даты:"
+  dtime_notify_user_bottom: "Пожалуйста заполняйте TS вовремя"
+
