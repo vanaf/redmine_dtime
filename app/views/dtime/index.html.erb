@@ -20,7 +20,12 @@
 <th><%=cf.name%></th>
 <% end %>
 </tr>
+<%
+totalCaldays = 0
+totalHours = 0
+totalActivitiesHours = Hash.new
 
+%>
 <% @projects.each do |project| -%>
 	<tr class="<%= cycle("odd", "even") %>">
 		<td><%=link_to_project(project)%></td>
@@ -29,13 +34,17 @@
 		project_hours = @hoursPerProject.select{|hpp| hpp.project_id == project.id}.first.sum_hours.to_i
 		project_activities_hours = @hoursPerActivityPerProject.select{|hpapp| hpapp.project_id == project.id}
 		project_members_hours = @hoursPerMembersPerProject.select{|hpmpp| hpmpp.project_id == project.id}
+		totalCaldays += Date.today - project.start_date
+		totalHours += project_hours
 		%>
                 <td><%=project_hours%></td>
 		<% @neededActivities.each do |a| %>
-			<% 
+			<%
 			project_activity_hours = project_activities_hours.select{|pah| pah.activity_id == a.id}.first
+			totalActivitiesHours[a] = 0 if totalActivitiesHours[a].blank?
 			project_activity_percents = 0 
 			if !project_activity_hours.blank? 
+				totalActivitiesHours[a] += project_activity_hours.sum_hours.to_f
 				project_activity_percents = (project_activity_hours.sum_hours.to_f/project_hours*100).to_i
 			end
 			%>
@@ -55,5 +64,28 @@
 
 	</tr>
 <% end -%>
+
+<tr>
+<th></th>
+<th align="left"><%=totalCaldays%></th>
+<th align="left"><%=totalHours%></th>
+<% @neededActivities.each do |a| %>
+<%
+totalActivityPercents = 0
+if totalHours != 0
+	totalActivityPercents = (totalActivitiesHours[a].to_f/totalHours*100).to_i
+end
+%>
+<th align="left"><%=totalActivityPercents%>%</th>
+<% end %>
+<th></th>
+<% @neededRoles.each do |r| %>
+<th></th>
+<% end %>
+<% @neededCF.each do |cf| %>
+<th></th>
+<% end %>
+</tr>
+
 
 </table>
