@@ -14,7 +14,7 @@ before_filter :check_rw_perm_and_redirect, :only => [:edit, :update, :destroy]
 		set_user_projects(User.current,:view_time_entries)
 
 		cond = ARCondition.new
-    		cond << ['project_id IN ('+@projects.collect{|p| p.id}.join(', ')+')']
+    		cond << ['project_id IN ('+@projects.collect{|p| p.id}.join(', ')+')'] if ! @projects.blank?
 		
 		
     		@hoursPerProject = TimeEntry.find(:all,:select =>"project_id, sum(hours) as sum_hours" ,:conditions => cond.conditions,:group => "project_id")
@@ -23,7 +23,7 @@ before_filter :check_rw_perm_and_redirect, :only => [:edit, :update, :destroy]
                 @hoursPerMembersPerProject = TimeEntry.find(:all,:select =>"project_id, user_id, sum(hours) as sum_hours" , :include => [:user] , :conditions => cond.conditions,:group => "project_id, user_id", :order => 'project_id, sum_hours DESC')
 
 		@neededActivities = TimeEntryActivity.shared.active.sort[0..1]
-		cond << ['activity_id IN ('+@neededActivities.collect{|a| a.id}.join(', ')+')']
+		cond << ['activity_id IN ('+@neededActivities.collect{|a| a.id}.join(', ')+')'] if ! @neededActivities.blank?
 
                 @neededRoles = Role.find(:all, :order => 'builtin, position')[0..0]
 

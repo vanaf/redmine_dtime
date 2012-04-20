@@ -28,15 +28,21 @@ totalActivitiesHours = Hash.new
 %>
 <% @projects.each do |project| -%>
 	<tr class="<%= cycle("odd", "even") %>">
+                <%
+		project_caldays = 0
+		project_hours = 0
+		project_hours_arr = @hoursPerProject.select{|hpp| hpp.project_id == project.id}
+                project_hours = project_hours_arr.first.sum_hours.to_i if ! project_hours_arr.blank?
+                project_activities_hours = @hoursPerActivityPerProject.select{|hpapp| hpapp.project_id == project.id}
+                project_members_hours = @hoursPerMembersPerProject.select{|hpmpp| hpmpp.project_id == project.id}
+		project_caldays = Date.today - project.start_date if ! project.start_date.blank?
+                totalCaldays += project_caldays
+                totalHours += project_hours
+
+                %>
+		
 		<td><%=link_to_project(project)%></td>
-                <td><%=Date.today - project.start_date%></td>
-		<%
-		project_hours = @hoursPerProject.select{|hpp| hpp.project_id == project.id}.first.sum_hours.to_i
-		project_activities_hours = @hoursPerActivityPerProject.select{|hpapp| hpapp.project_id == project.id}
-		project_members_hours = @hoursPerMembersPerProject.select{|hpmpp| hpmpp.project_id == project.id}
-		totalCaldays += Date.today - project.start_date
-		totalHours += project_hours
-		%>
+                <td><%=project_caldays%></td>
                 <td><%=project_hours%></td>
 		<% @neededActivities.each do |a| %>
 			<%
@@ -56,7 +62,7 @@ totalActivitiesHours = Hash.new
 			<%end%>
                 </td>
                 <% @neededRoles.each do |r| %>
-                	<td><%=project.users_by_role[r].collect{|user| link_to_user(user)}.join(", ")%></td>
+                	<td><%=project.users_by_role[r].collect{|user| link_to_user(user)}.join(", ") if ! project.users_by_role[r].blank?%></td>
                 <% end %>
                 <% @neededCF.each do |cf| %>
                         <td><%=textilizable project.custom_value_for(cf).to_s%></td>
